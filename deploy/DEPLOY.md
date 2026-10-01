@@ -59,7 +59,8 @@ vi .env
 DATABASE_URI=mysql+pymysql://aml_user:【上面设的密码】@localhost:3306/aml_eval
 DASHSCOPE_API_KEY=【独立申请的 dashscope Key；无则留空，自动降级关键词模式】
 EMBEDDING_MODEL=text-embedding-v3
-API_AUTH_TOKEN=【自行生成的 Memory System Key，如 openssl rand -hex 32；留空=无鉴权】
+API_AUTH_TOKEN=【API_AUTH_TOKEN：服务器 .env 里的值】
+
 PORT=8600
 ```
 
@@ -82,7 +83,8 @@ curl http://127.0.0.1:8600/health
 ```bash
 # 证书文件（控制台下载的两个文件，从本地 scp 上传后）：
 mkdir -p /etc/nginx/ssl
-mv aml.ningxia-tour.top.pem aml.ningxia-tour.top.key /etc/nginx/ssl/
+mv /root/aml.ningxia-tour.top.pem /root/aml.ningxia-tour.top.key /etc/nginx/ssl/
+
 chmod 600 /etc/nginx/ssl/aml.ningxia-tour.top.key
 
 cp /opt/aml-memory-adapter/deploy/nginx-aml.conf /etc/nginx/conf.d/aml-ningxia-tour.top.conf
@@ -105,13 +107,13 @@ curl https://aml.ningxia-tour.top/health
 # Add 写入
 curl -X POST https://aml.ningxia-tour.top/add \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer 【API_AUTH_TOKEN】" \
+  -H "Authorization: Bearer 【API_AUTH_TOKEN：服务器 .env 里的值】" \
   -d '{"user_id":"smoke_u1","task_id":"t1","session_id":"s1","messages":[{"speaker":"user","content":"我是软件工程专业的大一新生"}]}'
 
 # Search 检索
 curl -X POST https://aml.ningxia-tour.top/search \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer 【API_AUTH_TOKEN】" \
+  -H "Authorization: Bearer 【API_AUTH_TOKEN：服务器 .env 里的值】" \
   -d '{"user_id":"smoke_u1","query":"用户的专业","top_k":5}'
 ```
 
