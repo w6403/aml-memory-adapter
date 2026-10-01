@@ -27,8 +27,11 @@ aml-adapter/
 │   ├── main.py             # FastAPI: POST /add, POST /search
 │   └── schemas.py          # 请求/响应模型（字段待 AML Key 后校准！）
 └── tests/
-    └── smoke.py            # 本地冒烟自测（离线可跑）
+    ├── smoke.py            # 本地冒烟自测（离线可跑）
+    └── local_eval.py       # LoCoMo 本地评测（Evidence Recall@K，调参用）
 ```
+
+> 本地评测数据 `tests/locomo10.json` 不入库，请从 [snap-research/locomo](https://github.com/snap-research/locomo) 下载后放入 tests/ 目录。
 
 ## 快速开始
 

@@ -24,23 +24,44 @@ except ImportError:
     _HAS_JIEBA = False
 
 _STOPWORDS = set('的了和是就都而及与着或一个没有我们你们他们这那也再说吧吗呢啊'.replace(' ', ''))
-_TOKEN_RE = re.compile(r'[\u4e00-\u9fa5a-zA-Z0-9]+')
+_EN_STOPWORDS = set(
+    'a an the and or but if then else when while at by for with about into through '
+    'during before after above below to from up down in out on off over under again '
+    'further once here there all any both each few more most other some such no nor '
+    'not only own same so than too very can will just should now of do does did doing '
+    'have has had having am is are was were be been being would could ought shall '
+    'i me my we our us you your he him his she her it its they them their this that '
+    'these those what which who whom how as'.split()
+)
+_TOKEN_RE = re.compile(r'[一-龥a-zA-Z0-9]+')
+_CJK_RE = re.compile(r'[一-龥]+')
+_LATIN_RE = re.compile(r'[a-zA-Z0-9]+')
 
 
-def extract_keywords(text: str, limit: int = 12) -> list:
-    """轻量关键词抽取：jieba 分词优先，退化到正则切词。不依赖 LLM。"""
+def extract_keywords(text: str, limit: int = 20) -> list:
+    """轻量关键词抽取（中英双语）：中文段走 jieba，英文/数字段按整词。
+    保留年份等数字 token（时序推理依赖）；不依赖 LLM。"""
     if not text:
         return []
     if _HAS_JIEBA:
-        words = [w.strip() for w in jieba.cut_for_search(text)]
+        words = []
+        pos = 0
+        for m in _CJK_RE.finditer(text):
+            words.extend(_LATIN_RE.findall(text[pos:m.start()]))
+            words.extend(w.strip() for w in jieba.cut_for_search(m.group()))
+            pos = m.end()
+        words.extend(_LATIN_RE.findall(text[pos:]))
     else:
         words = _TOKEN_RE.findall(text)
     seen, out = set(), []
     for w in words:
-        if len(w) < 2 or w.lower() in _STOPWORDS or w.isdigit():
+        lw = w.lower()
+        if len(w) < 2 or lw in _STOPWORDS or lw in _EN_STOPWORDS:
             continue
-        if w.lower() not in seen:
-            seen.add(w.lower())
+        if w.isdigit() and len(w) < 3:  # 丢弃短数字噪声，保留年份/日期
+            continue
+        if lw not in seen:
+            seen.add(lw)
             out.append(w)
         if len(out) >= limit:
             break

@@ -4,5 +4,6 @@ __pycache__/
 .env
 *.db
 *.sqlite*
+tests/locomo10.json
 !node_modules/
 .DS_Store
