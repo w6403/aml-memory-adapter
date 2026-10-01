@@ -1,0 +1,16 @@
+[Unit]
+Description=aml-memory-adapter (Agent Memory Challenge eval API)
+After=network.target mysqld.service
+
+[Service]
+Type=simple
+User=nginx
+Group=nginx
+WorkingDirectory=/opt/aml-memory-adapter
+ExecStart=/opt/aml-memory-adapter/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8600
+Restart=always
+RestartSec=3
+# 日志走 journald：journalctl -u aml-api -f
+
+[Install]
+WantedBy=multi-user.target
