@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('aml-adapter')
 
 app = FastAPI(
-    title='zhifang-aml-adapter',
+    title='aml-memory-adapter',
     description='Agent Memory Challenge 参赛适配器（memory engine: memory-core）',
     version='0.1.0',
 )
@@ -50,7 +50,7 @@ async def check_auth(request: Request):
 async def health():
     return {
         'status': 'ok',
-        'service': 'zhifang-aml-adapter',
+        'service': 'aml-memory-adapter',
         'embedding_available': embedder.available,
         'vector_weight': engine.vector_weight,
     }

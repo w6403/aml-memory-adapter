@@ -1,6 +1,6 @@
-# zhifang-aml-adapter
+# aml-memory-adapter
 
-Agent Memory Challenge（CSIG，2026 Cycle 2）参赛适配器：把记忆引擎以标准化 **Add / Search** 接口接入 [Agent Memory Leaderboard](https://agentmemoryleaderboard.ai/) 评测平台。
+Agent Memory Challenge（CSIG，2026 Cycle 2）参赛适配器：把记忆引擎以标准化 **Add / Search** 接口接入 [Agent Memory Leaderboard](https://agentmemoryleaderboard.ai/) 评测平台。（文本赛道 · 开源方法榜 · 个人参赛）
 
 ## 来源与改动声明（AML 开源榜合规要求）
 
