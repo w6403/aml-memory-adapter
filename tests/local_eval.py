@@ -21,6 +21,10 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env'),
+            override=True)
+
 from memory_core import MemoryEngine, EmbeddingClient
 
 # LoCoMo 论文的 QA 类目（类别 4/5 多数无证据，仅供对照）
@@ -100,6 +104,9 @@ def main():
     ap.add_argument('--data', default=os.path.join(os.path.dirname(__file__), 'locomo10.json'))
     ap.add_argument('--top-k', type=int, default=20)
     ap.add_argument('--max-conv', type=int, default=10)
+    ap.add_argument('--vector-weight', type=float, default=0.6, help='向量相似度权重（向量模式）')
+    ap.add_argument('--kw-weight', type=float, default=0.3, help='关键词权重（降级模式按 kw:recency 归一化）')
+    ap.add_argument('--recency-weight', type=float, default=0.1, help='时间近因权重')
     ap.add_argument('--out', default='', help='可选：把结果写成 JSON')
     args = ap.parse_args()
 
@@ -107,7 +114,9 @@ def main():
     if os.path.exists(db):
         os.remove(db)
     embedder = EmbeddingClient()  # 无 DASHSCOPE_API_KEY 时自动降级关键词模式
-    engine = MemoryEngine(f'sqlite:///{db}', embedding_client=embedder)
+    engine = MemoryEngine(f'sqlite:///{db}', embedding_client=embedder,
+                          vector_weight=args.vector_weight,
+                          keyword_weight=args.kw_weight, recency_weight=args.recency_weight)
     mode = 'vector+keyword' if embedder.available else 'keyword-only (degraded)'
     print(f'检索模式: {mode} | top_k={args.top_k}')
 

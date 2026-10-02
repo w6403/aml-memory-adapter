@@ -29,11 +29,11 @@ class Config:
 
     PORT = int(os.getenv('PORT', '8600'))
 
-    # 检索参数
+    # 检索参数（2026-10-02 按 LoCoMo Recall@100 权重扫描确定，详见材料文档 §四）
     TOP_K_DEFAULT = 20
-    VECTOR_WEIGHT = 0.6      # 向量相似度权重
-    KEYWORD_WEIGHT = 0.3     # 关键词重合权重
-    RECENCY_WEIGHT = 0.1     # 时间近因权重
+    VECTOR_WEIGHT = 0.5      # 向量相似度权重
+    KEYWORD_WEIGHT = 0.5     # 关键词重合权重（IDF 加权）
+    RECENCY_WEIGHT = 0.0     # 时间近因权重（LoCoMo 证据时间随机分布，此项为噪声）
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_recycle': 3600,
         'pool_pre_ping': True,

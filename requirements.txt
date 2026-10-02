@@ -6,3 +6,4 @@ python-dotenv>=1.0.0
 requests>=2.31.0
 pydantic>=2.6
 jieba>=0.42
+numpy>=1.26
