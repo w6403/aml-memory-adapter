@@ -104,13 +104,13 @@ getsebool httpd_can_network_connect   # 期望 on；若不是：setsebool -P htt
 ```bash
 curl https://aml.ningxia-tour.top/health
 
-# Add 写入
+# Add 写入（2026-10-02 起为官方契约格式：request_id / role / 响应 echo）
 curl -X POST https://aml.ningxia-tour.top/add \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer 【API_AUTH_TOKEN：服务器 .env 里的值】" \
-  -d '{"user_id":"smoke_u1","task_id":"t1","session_id":"s1","messages":[{"speaker":"user","content":"我是软件工程专业的大一新生"}]}'
+  -d '{"request_id":"smoke:chunk-0","user_id":"smoke_u1","session_id":"s1","messages":[{"role":"user","content":"我是软件工程专业的大一新生"}]}'
 
-# Search 检索
+# Search 检索（响应为 {data:[{id,content,score,created_at}]}）
 curl -X POST https://aml.ningxia-tour.top/search \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer 【API_AUTH_TOKEN：服务器 .env 里的值】" \
@@ -123,8 +123,11 @@ curl -X POST https://aml.ningxia-tour.top/search \
 
 ```bash
 cd /opt/aml-memory-adapter && git pull
+# 若 requirements.txt 有变化（如 2026-10-02 新增 numpy）：
+.venv/bin/pip install -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
 systemctl restart aml-api
 curl https://aml.ningxia-tour.top/health
+# health 里 vector_weight 显示 0.5 即为 2026-10-02 后的版本
 ```
 
 ⚠️ **Full 评测申报后冻结代码**：git pull 只允许修 bug，不得改 API 契约/鉴权/字段。
