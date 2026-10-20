@@ -8,7 +8,7 @@
   # 打本地起的服务
   python tests/platform_smoke.py --base-url http://127.0.0.1:8600
   # 打线上部署（token 为服务器 .env 的 API_AUTH_TOKEN）
-  python tests/platform_smoke.py --base-url https://aml.ningxia-tour.top --token <TOKEN>
+  python tests/platform_smoke.py --base-url https://aml.example.com --token <TOKEN>
 """
 import argparse
 import json
