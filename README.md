@@ -25,7 +25,7 @@ aml-adapter/
 │   └── embedding_client.py # 通义千问 text-embedding（降级安全）
 ├── app/
 │   ├── main.py             # FastAPI: POST /add, POST /search
-│   └── schemas.py          # 请求/响应模型（字段待 AML Key 后校准！）
+│   └── schemas.py          # 请求/响应模型（已按官方 API Guide 校准）
 └── tests/
     ├── smoke.py            # 本地冒烟自测（离线可跑）
     └── local_eval.py       # LoCoMo 本地评测（Evidence Recall@K，调参用）
@@ -46,11 +46,3 @@ python tests/smoke.py
 # 2. 启动服务（先复制 .env.example 为 .env 并填写）
 uvicorn app.main:app --host 0.0.0.0 --port 8600
 ```
-
-## 参赛待办（截至 2026-10-31）
-
-- [ ] 官网申请评测 Key：<https://agentmemoryleaderboard.ai/evaluation>
-- [ ] **按官网 API Guide 逐字段校准 `app/schemas.py`（当前为推断结构）**
-- [ ] 配置独立 MySQL 库 `aml_eval`，部署到公网服务器（须保持可用至 11-04）
-- [ ] 平台 Smoke 测试通过后，发起第一次 Full（不晚于 10-15）
-- [ ] GitHub 公开仓库 + 固定 commit（开源榜要求）
