@@ -26,6 +26,7 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
             override=True)
 
 from memory_core import MemoryEngine, EmbeddingClient
+from config import Config
 
 # LoCoMo 论文的 QA 类目（类别 4/5 多数无证据，仅供对照）
 CATEGORY_NAMES = {
@@ -138,6 +139,8 @@ def main():
     print(f'{"OVERALL":<14}{total_hits / total_qa:>10.3f}{total_hits:>7}{total_qa:>7}')
     avg_ms = sum(latencies) / len(latencies) * 1000
     print(f'\n平均检索延迟: {avg_ms:.1f} ms | 无证据跳过: {skipped} | 总耗时: {total_s:.1f}s')
+    # v0.3.0 治理动作计数：LoCoMo 无治理场景，全程应近零；>20 判阈值过松
+    print(f'治理动作: {engine.stats}')
 
     if args.out:
         result = {

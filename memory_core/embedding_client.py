@@ -28,13 +28,16 @@ _DEFAULT_CACHE = os.path.join(
 
 
 class EmbeddingClient:
-    def __init__(self, api_key: str = '', model: str = 'text-embedding-v3',
+    def __init__(self, api_key: str = '', model: str = 'text-embedding-v4',
                  timeout: int = 10, max_retries: int = 2,
+                 dimensions: int = 0,
                  cache_path: str = _DEFAULT_CACHE):
         self.api_key = api_key or os.getenv('DASHSCOPE_API_KEY', '')
         self.model = model
         self.timeout = timeout
         self.max_retries = max_retries
+        # 显式维度护栏（v3/v4 默认均 1024）；0 = 不传给服务端
+        self.dimensions = dimensions
         # cache_path=None 关闭缓存；默认项目根目录 .embedding_cache.db
         self._lock = threading.Lock()
         self._cache = None
@@ -44,7 +47,9 @@ class EmbeddingClient:
                 'CREATE TABLE IF NOT EXISTS emb (k TEXT PRIMARY KEY, v TEXT)')
 
     def _cache_key(self, text: str) -> str:
-        return hashlib.sha256(f'{self.model}\n{text}'.encode('utf-8')).hexdigest()
+        # key 含模型名 + 维度：换模型/改维度后旧缓存自然 miss，不会串维度
+        return hashlib.sha256(
+            f'{self.model}\n{self.dimensions}\n{text}'.encode('utf-8')).hexdigest()
 
     def _cache_get(self, text: str):
         if not self._cache:
@@ -96,6 +101,8 @@ class EmbeddingClient:
             'Content-Type': 'application/json'
         }
         data = {'model': self.model, 'input': batch}
+        if self.dimensions > 0:
+            data['dimensions'] = self.dimensions
         for attempt in range(self.max_retries):
             try:
                 resp = requests.post(DASHSCOPE_EMBED_URL, headers=headers,

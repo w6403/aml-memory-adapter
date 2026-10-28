@@ -28,6 +28,7 @@ embedder = EmbeddingClient(
     model=Config.EMBEDDING_MODEL,
     timeout=Config.EMBEDDING_TIMEOUT,
     max_retries=Config.EMBEDDING_MAX_RETRIES,
+    dimensions=Config.EMBEDDING_DIMENSIONS,
 )
 engine = MemoryEngine(
     database_uri=Config.DATABASE_URI,
@@ -35,6 +36,20 @@ engine = MemoryEngine(
     vector_weight=Config.VECTOR_WEIGHT,
     keyword_weight=Config.KEYWORD_WEIGHT,
     recency_weight=Config.RECENCY_WEIGHT,
+    governance_enabled=Config.GOVERNANCE_ENABLED,
+    summary_enabled=Config.SUMMARY_ENABLED,
+    query_boost_enabled=Config.QUERY_BOOST_ENABLED,
+    forget_sim_threshold=Config.FORGET_SIM_THRESHOLD,
+    forget_strong_sim=Config.FORGET_STRONG_SIM,
+    forget_max_targets=Config.FORGET_MAX_TARGETS,
+    update_sim_threshold=Config.UPDATE_SIM_THRESHOLD,
+    update_min_shared_kws=Config.UPDATE_MIN_SHARED_KWS,
+    dedup_sim_threshold=Config.DEDUP_SIM_THRESHOLD,
+    summary_min_messages=Config.SUMMARY_MIN_MESSAGES,
+    summary_max_sents=Config.SUMMARY_MAX_SENTS,
+    summary_boost=Config.SUMMARY_BOOST,
+    recency_query_boost=Config.RECENCY_QUERY_BOOST,
+    forget_query_boost=Config.FORGET_QUERY_BOOST,
 )
 
 
@@ -57,6 +72,7 @@ async def health():
         'status': 'ok',
         'service': 'aml-memory-adapter',
         'embedding_available': embedder.available,
+        'embedding_model': embedder.model,
         'vector_weight': engine.vector_weight,
     }
 

@@ -18,8 +18,11 @@ class Config:
     )
 
     # 通义千问 embedding（与主项目共用 dashscope 平台，但 Key 独立申请）
+    # v0.3.0 起默认 text-embedding-v4（开源方法榜合规要求，Qwen3-Embedding 系）；
+    # 默认维度 1024 与 v3 相同，显式传 dimensions 作护栏（防默认值变动）
     DASHSCOPE_API_KEY = os.getenv('DASHSCOPE_API_KEY', '')
-    EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'text-embedding-v3')
+    EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'text-embedding-v4')
+    EMBEDDING_DIMENSIONS = int(os.getenv('EMBEDDING_DIMENSIONS', '1024'))
     EMBEDDING_TIMEOUT = 10  # 秒
     EMBEDDING_MAX_RETRIES = 2
 
@@ -30,11 +33,24 @@ class Config:
     PORT = int(os.getenv('PORT', '8600'))
 
     # 检索参数（2026-10-02 按 LoCoMo Recall@100 权重扫描确定，详见材料文档 §四）
-    TOP_K_DEFAULT = 20
     VECTOR_WEIGHT = 0.5      # 向量相似度权重
     KEYWORD_WEIGHT = 0.5     # 关键词重合权重（IDF 加权）
     RECENCY_WEIGHT = 0.0     # 时间近因权重（LoCoMo 证据时间随机分布，此项为噪声）
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_recycle': 3600,
-        'pool_pre_ping': True,
-    }
+
+    # ---- v0.3.0 记忆治理（D1 新值覆盖 / D3 删除遗忘）：全部条件触发 ----
+    GOVERNANCE_ENABLED = os.getenv('GOVERNANCE_ENABLED', 'true').lower() == 'true'
+    FORGET_SIM_THRESHOLD = 0.45    # 遗忘关键词驱动的相似度下限（需共享 >=2 内容关键词）
+    FORGET_STRONG_SIM = 0.85       # 遗忘直接命中阈值（无需关键词交集）
+    FORGET_MAX_TARGETS = 3         # 每条遗忘指令最多 supersede 条数
+    UPDATE_SIM_THRESHOLD = 0.55    # 新值覆盖相似度下限（v4 实测真实覆盖对 ~0.6，异主题 ~0.39）
+    UPDATE_MIN_SHARED_KWS = 2      # 覆盖判定的关键词交集下限
+    DEDUP_SIM_THRESHOLD = 0.97     # 近同文去重阈值
+
+    # ---- v0.3.0 摘要压缩（F1）与 query 条件注入 ----
+    SUMMARY_ENABLED = os.getenv('SUMMARY_ENABLED', 'true').lower() == 'true'
+    SUMMARY_MIN_MESSAGES = 20      # session 累计消息达到此数才生成摘要
+    SUMMARY_MAX_SENTS = 5          # 摘要代表句数
+    QUERY_BOOST_ENABLED = os.getenv('QUERY_BOOST_ENABLED', 'true').lower() == 'true'
+    SUMMARY_BOOST = 0.5            # aggregate query 下摘要记录乘法提升（否则 ×0.8）
+    RECENCY_QUERY_BOOST = 0.15     # recency query 的加法近因分
+    FORGET_QUERY_BOOST = 0.15      # forget query 下遗忘指令记录的加法提升
